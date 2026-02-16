@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Form,
   Input,
@@ -6,6 +6,7 @@ import {
   Card,
   Typography,
   Divider,
+  message,
 } from "antd";
 import {
   UserOutlined,
@@ -13,12 +14,37 @@ import {
   MailOutlined,
   PhoneOutlined,
 } from "@ant-design/icons";
-import { useNavigate } from "react-router-dom"; 
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const { Title, Text, Link } = Typography;
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  const onFinish = async (values) => {
+    setLoading(true);
+
+    try {
+      await axios.post(
+        "http://localhost:8080/api/users/register",
+        values
+      );
+
+      message.success("Registered Successfully!");
+      navigate("/");
+
+    } catch (error) {
+      if (error.response) {
+        message.error(error.response.data);
+      } else {
+        message.error("Server not reachable");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={styles.container}>
@@ -34,26 +60,49 @@ const Signup = () => {
           Join us by creating a new account
         </Text>
 
-        <Form layout="vertical" name="signup_form">
-
-          <Form.Item label="Full Name" name="name">
+        <Form layout="vertical" onFinish={onFinish}>
+          <Form.Item
+            label="Full Name"
+            name="name"
+            rules={[{ required: true, message: "Please enter your name!" }]}
+          >
             <Input prefix={<UserOutlined />} size="large" />
           </Form.Item>
 
-          <Form.Item label="Email" name="email">
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              { required: true, message: "Please enter your email!" },
+              { type: "email", message: "Enter valid email!" },
+            ]}
+          >
             <Input prefix={<MailOutlined />} size="large" />
           </Form.Item>
 
-          <Form.Item label="Phone Number" name="phone">
+          <Form.Item
+            label="Phone Number"
+            name="phone"
+          >
             <Input prefix={<PhoneOutlined />} size="large" />
           </Form.Item>
 
-          <Form.Item label="Password" name="password">
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Please enter password!" }]}
+          >
             <Input.Password prefix={<LockOutlined />} size="large" />
           </Form.Item>
 
           <Form.Item>
-            <Button type="primary" block size="large">
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              size="large"
+              loading={loading}
+            >
               Sign Up
             </Button>
           </Form.Item>
@@ -62,13 +111,12 @@ const Signup = () => {
 
           <div style={{ textAlign: "center" }}>
             <Text>
-              Already have an ac?{" "}
+              Already have an account?{" "}
               <Link onClick={() => navigate("/")}>
                 Login
               </Link>
             </Text>
           </div>
-
         </Form>
       </Card>
     </div>
@@ -81,7 +129,7 @@ const styles = {
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
-    background: "transparent", 
+    background: "transparent",
   },
   card: {
     width: 400,
@@ -90,7 +138,5 @@ const styles = {
     background: "rgba(255,255,255,0.95)",
   },
 };
-
-
 
 export default Signup;
