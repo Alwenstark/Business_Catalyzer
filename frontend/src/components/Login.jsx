@@ -28,13 +28,19 @@ const Login = () => {
         values
       );
 
-      message.success(response.data || "Login Successful");
+      const user = response.data;
+      localStorage.setItem("user", JSON.stringify(user));
+      message.success("Login Successful");
 
-      navigate("/landing");
+      if (user.role === "BUSINESS") {
+        navigate("/landing");
+      } else if (user.role === "CUSTOMER") {
+        navigate("/complaints");
+      }
 
     } catch (error) {
       if (error.response) {
-        message.error(error.response.data);
+        message.error(error.response.data.message || "Login failed");
       } else {
         message.error("Server not reachable");
       }
@@ -74,18 +80,11 @@ const Login = () => {
             onFinish={onFinish}
           >
             <Form.Item
-              label="Email"
-              name="email"
-              rules={[
-                { required: true, message: "Please enter your email!" },
-                { type: "email", message: "Enter a valid email!" },
-              ]}
+              label="Username or Email"
+              name="loginId"
+              rules={[{ required: true, message: "Enter username or email!" }]}
             >
-              <Input
-                prefix={<UserOutlined />}
-                placeholder="Enter your email"
-                size="large"
-              />
+              <Input prefix={<UserOutlined />} placeholder="Enter Username or Email" size="large" />
             </Form.Item>
 
             <Form.Item
