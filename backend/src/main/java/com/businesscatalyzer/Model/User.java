@@ -1,6 +1,5 @@
 package com.businesscatalyzer.Model;
 
-
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -17,9 +16,23 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
+    private String name;
+
+    @Column(unique = true)
+    private String username;
+
+    @Column(unique = true)
     private String email;
 
-    @Column(nullable = false)
+    private String phone;
+
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private Role role;
+
+    private String companyName;
+    private String companyAddress;
+    private String gst;
 }

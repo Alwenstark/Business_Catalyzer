@@ -1,11 +1,14 @@
 import React from "react";
 import { Layout } from "antd";
 import { useLocation } from "react-router-dom";
+import Navbar from "./Navbar";
 import bg from "../assets/emoji_wave.png";
 
 const MainLayout = ({ children }) => {
   const location = useLocation();
   const isSignupPage = location.pathname === "/signup";
+  const hideNavbar =
+    location.pathname === "/" || location.pathname === "/signup" || location.pathname === "/logout";
 
   return (
     <Layout
@@ -23,6 +26,7 @@ const MainLayout = ({ children }) => {
 
       }}
     >
+      {!hideNavbar && <Navbar />}
       {children}
     </Layout>
   );
