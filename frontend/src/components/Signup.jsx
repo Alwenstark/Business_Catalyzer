@@ -10,7 +10,10 @@ import {
   Radio,
   Row,
   Col,
+  Upload,
+  Select
 } from "antd";
+
 import {
   UserOutlined,
   LockOutlined,
@@ -18,38 +21,70 @@ import {
   PhoneOutlined,
   BankOutlined,
   EnvironmentOutlined,
+  PlusOutlined
 } from "@ant-design/icons";
+
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const { Title, Text, Link } = Typography;
 
+
 const Signup = () => {
+
+  const { Option } = Select;
   const navigate = useNavigate();
+
   const [loading, setLoading] = useState(false);
   const [accountType, setAccountType] = useState("customer");
+  const [profileImage, setProfileImage] = useState(null);
 
+  // Convert Image → Base64
+  const getBase64 = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = (error) => reject(error);
+    });
+
+  // Upload handler
+  const handleUpload = async ({ file }) => {
+    const base64 = await getBase64(file);
+    setProfileImage(base64);
+  };
+
+  // Submit form
   const onFinish = async (values) => {
+
     setLoading(true);
 
     try {
 
       const payload = {
         ...values,
-        role: accountType === "company" ? "BUSINESS" : "CUSTOMER"
+        role: accountType === "company" ? "BUSINESS" : "CUSTOMER",
+        profileImage: profileImage
       };
 
-      await axios.post("http://localhost:8080/api/users/register", payload);
+      await axios.post(
+        "http://localhost:8080/api/users/register",
+        payload
+      );
 
       message.success("Registered Successfully!");
       navigate("/");
 
     } catch (error) {
+
       if (error.response) {
-        message.error(error.response.data.message || "Registration failed");
+        message.error(
+          error.response.data.message || "Registration failed"
+        );
       } else {
         message.error("Server not reachable");
       }
+
     } finally {
       setLoading(false);
     }
@@ -58,13 +93,18 @@ const Signup = () => {
   return (
     <div style={styles.container}>
       <Card style={styles.card} bordered={false}>
-        <Title level={3} style={{ textAlign: "center", marginBottom: 0 }}>
+
+        <Title level={3} style={{ textAlign: "center" }}>
           Create Account
         </Title>
 
         <Text
           type="secondary"
-          style={{ display: "block", textAlign: "center", marginBottom: 24 }}
+          style={{
+            display: "block",
+            textAlign: "center",
+            marginBottom: 20
+          }}
         >
           Join us by creating a new account
         </Text>
@@ -72,18 +112,33 @@ const Signup = () => {
         <Form layout="vertical" onFinish={onFinish}>
 
           {/* ACCOUNT TYPE */}
-          <Form.Item label="Account Type" name="type" initialValue="customer">
+
+          <Form.Item
+            label="Account Type"
+            name="type"
+            initialValue="customer"
+          >
             <Radio.Group
               onChange={(e) => setAccountType(e.target.value)}
               value={accountType}
-              style={{ width: "100%", display: "flex", justifyContent: "center" }}
+              style={{ display: "flex", justifyContent: "center" }}
             >
-              <Radio.Button value="customer">Customer</Radio.Button>
-              <Radio.Button value="company">Company</Radio.Button>
+              <Radio.Button value="customer">
+                Customer
+              </Radio.Button>
+
+              <Radio.Button value="company">
+                Company
+              </Radio.Button>
+
             </Radio.Group>
           </Form.Item>
 
+
+          {/* BASIC DETAILS */}
+
           <Row gutter={16}>
+
             <Col span={12}>
               <Form.Item
                 label="Full Name"
@@ -93,49 +148,81 @@ const Signup = () => {
                 <Input prefix={<UserOutlined />} size="large" />
               </Form.Item>
             </Col>
+
             <Col span={12}>
               <Form.Item
                 label="Username"
                 name="username"
                 rules={[
                   { required: true, message: "Enter username" },
-                  { min: 4, message: "Username must be at least 4 characters" }
+                  { min: 4, message: "Minimum 4 characters" }
                 ]}
               >
                 <Input prefix={<UserOutlined />} size="large" />
               </Form.Item>
             </Col>
 
+          </Row>
+
+
+          {/* CONTACT */}
+
+          <Row gutter={16}>
+
             <Col span={12}>
-              <Form.Item
-                label="Phone"
-                name="phone"
-              >
+              <Form.Item label="Phone" name="phone">
                 <Input prefix={<PhoneOutlined />} size="large" />
               </Form.Item>
             </Col>
-          </Row>
 
-          <Row gutter={16}>
-            <Col span={24}>
+            <Col span={12}>
               <Form.Item
                 label="Email"
                 name="email"
                 rules={[
                   { required: true, message: "Enter email" },
-                  { type: "email", message: "Invalid email" },
+                  { type: "email", message: "Invalid email" }
                 ]}
               >
                 <Input prefix={<MailOutlined />} size="large" />
               </Form.Item>
             </Col>
+
           </Row>
 
-          {/* COMPANY SECTION */}
+
           {accountType === "company" && (
             <>
               <Row gutter={16}>
-                <Col span={12}>
+
+                <Col span={6}>
+                  <Form.Item label="Company Logo">
+                    <Upload
+                      accept="image/*"
+                      showUploadList={false}
+                      customRequest={handleUpload}
+                    >
+                      <Button icon={<PlusOutlined />} block>
+                        Upload
+                      </Button>
+                    </Upload>
+
+                    {profileImage && (
+                      <img
+                        src={profileImage}
+                        alt="logo"
+                        style={{
+                          marginTop: 10,
+                          width: "100%",
+                          borderRadius: 8,
+                          border: "1px solid #eee"
+                        }}
+                      />
+                    )}
+                  </Form.Item>
+                </Col>
+
+                <Col span={18}>
                   <Form.Item
                     label="Company Name"
                     name="companyName"
@@ -145,44 +232,82 @@ const Signup = () => {
                   </Form.Item>
                 </Col>
 
-                <Col span={12}>
-                  <Form.Item
-                    label="GST / Registration ID"
-                    name="gst"
-                  >
-                    <Input size="large" />
-                  </Form.Item>
-                </Col>
               </Row>
 
+
               <Row gutter={16}>
-                <Col span={24}>
-                  <Form.Item
-                    label="Company Address"
-                    name="companyAddress"
-                    rules={[{ required: true, message: "Enter company address" }]}
-                  >
-                    <Input
-                      prefix={<EnvironmentOutlined />}
-                      size="large"
-                    />
+
+                <Col span={12}>
+                  <Form.Item label="GST / Registration ID" name="gst">
+                    <Input />
                   </Form.Item>
                 </Col>
+
+                <Col span={12}>
+                  <Form.Item label="Company Type" name="companyType">
+                    <Select placeholder="Select Category">
+                      <Select.Option value="School">School</Select.Option>
+                      <Select.Option value="College">College</Select.Option>
+                      <Select.Option value="Company">Company</Select.Option>
+                      <Select.Option value="Cafe">Cafe</Select.Option>
+                      <Select.Option value="Hotel">Hotel</Select.Option>
+                      <Select.Option value="Restaurant">Restaurant</Select.Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+
               </Row>
+
+
+              <Row gutter={16}>
+
+                <Col span={8}>
+                  <Form.Item label="State" name="state">
+                    <Input placeholder="State" />
+                  </Form.Item>
+                </Col>
+
+                <Col span={8}>
+                  <Form.Item label="District" name="district">
+                    <Input placeholder="District" />
+                  </Form.Item>
+                </Col>
+
+                <Col span={8}>
+                  <Form.Item label="Pincode" name="pincode">
+                    <Input placeholder="Pincode" />
+                  </Form.Item>
+                </Col>
+
+              </Row>
+
+
+              <Form.Item
+                label="Company Address"
+                name="companyAddress"
+                rules={[{ required: true, message: "Enter address" }]}
+              >
+                <Input prefix={<EnvironmentOutlined />} />
+              </Form.Item>
             </>
           )}
 
-          <Row gutter={16}>
-            <Col span={24}>
-              <Form.Item
-                label="Password"
-                name="password"
-                rules={[{ required: true, message: "Enter password" }]}
-              >
-                <Input.Password prefix={<LockOutlined />} size="large" />
-              </Form.Item>
-            </Col>
-          </Row>
+
+          {/* PASSWORD */}
+
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[{ required: true, message: "Enter password" }]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              size="large"
+            />
+          </Form.Item>
+
+
+          {/* BUTTON */}
 
           <Form.Item>
             <Button
@@ -196,12 +321,15 @@ const Signup = () => {
             </Button>
           </Form.Item>
 
+
           <Divider>Or</Divider>
 
           <div style={{ textAlign: "center" }}>
             <Text>
               Already have an account?{" "}
-              <Link onClick={() => navigate("/")}>Login</Link>
+              <Link onClick={() => navigate("/")}>
+                Login
+              </Link>
             </Text>
           </div>
 
@@ -211,19 +339,24 @@ const Signup = () => {
   );
 };
 
+
 const styles = {
+
   container: {
     height: "100vh",
     display: "flex",
     justifyContent: "center",
     alignItems: "center",
+    overflow: "auto"
   },
+
   card: {
-    width: 500,
-    borderRadius: 12,
-    boxShadow: "0 8px 30px rgba(0,0,0,0.15)",
-    background: "rgba(255,255,255,0.95)",
-  },
+    width: 700,
+    borderRadius: 14,
+    boxShadow: "0 10px 35px rgba(0,0,0,0.15)",
+    background: "rgba(255,255,255,0.95)"
+  }
+
 };
 
 export default Signup;

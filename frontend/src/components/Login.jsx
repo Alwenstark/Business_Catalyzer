@@ -29,7 +29,11 @@ const Login = () => {
       );
 
       const user = response.data;
+
       localStorage.setItem("user", JSON.stringify(user));
+      localStorage.setItem("userId", user.id);
+      localStorage.setItem("role", user.role);
+
       message.success("Login Successful");
 
       if (user.role === "BUSINESS") {
