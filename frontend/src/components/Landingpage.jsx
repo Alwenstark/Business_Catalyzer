@@ -82,10 +82,20 @@ const Landingpage = () => {
   };
 
   return (
-    <Layout>
+    <Layout
+      className="landing-scroll"
+      style={{
+        height: "100vh",
+        overflowY: "auto",
+        background: "linear-gradient(135deg, #1677ff 0%, #ffffff 100%)",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat"
+      }}
+    >
 
       <Content style={{ padding: "30px" }}>
-        
+
         {/* FILTER BUTTONS */}
         <Row justify="center" style={{ marginBottom: 20 }}>
           <Button type="primary" style={{ margin: 5 }}>Last 7 Days</Button>

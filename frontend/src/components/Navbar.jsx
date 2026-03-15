@@ -7,16 +7,13 @@ const { Header } = Layout;
 const { Text } = Typography;
 
 const Navbar = () => {
-
   const navigate = useNavigate();
   const location = useLocation();
 
   const handleMenuClick = (e) => {
-
     const user = JSON.parse(localStorage.getItem("user"));
 
     if (e.key === "home") {
-
       if (!user) {
         navigate("/");
         return;
@@ -45,7 +42,6 @@ const Navbar = () => {
   ];
 
   const getSelectedKey = () => {
-
     if (
       location.pathname === "/landing" ||
       location.pathname === "/complaints"
@@ -70,8 +66,6 @@ const Navbar = () => {
         padding: "0 40px",
       }}
     >
-
-      {/* LEFT LOGO */}
       <div
         style={{
           color: "#fff",
@@ -84,8 +78,8 @@ const Navbar = () => {
         Business Catalyzer
       </div>
 
-      {/* CENTER MENU */}
       <Menu
+        className="cool-navbar-menu"
         theme="dark"
         mode="horizontal"
         selectedKeys={getSelectedKey()}
@@ -103,18 +97,16 @@ const Navbar = () => {
           },
           {
             key: "messages",
-            label: "Messages (3)",
+            label: "Messages",
           },
         ]}
       />
 
-      {/* ACCOUNT MENU */}
       <Dropdown menu={{ items: accountMenu }}>
         <Text style={{ color: "#fff", cursor: "pointer" }}>
           My Account <DownOutlined />
         </Text>
       </Dropdown>
-
     </Header>
   );
 };

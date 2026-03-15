@@ -4,43 +4,44 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
-@Table(name = "users")
+@Table(name = "cases")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class User {
+public class Case {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String name;
-
-    @Column(unique = true)
-    private String username;
-
-    @Column(unique = true)
-    private String email;
-
-    private String phone;
-    private String password;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-    private Role role;
+    // Case belongs to a user
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
 
     private String companyName;
-    private String companyAddress;
     private String gst;
-
     private String state;
     private String district;
     private String pincode;
     private String companyType;
 
+    @Column(length = 2000)
+    private String complaint;
+
+    private String notes;
+
+    @Enumerated(EnumType.STRING)
+    private Mood mood;
+
+    @Enumerated(EnumType.STRING)
+    private CaseStatus status;
+
+    // Base64 image
     @Lob
     @Column(columnDefinition = "LONGTEXT")
-    private String profileImage;
+    private String imageBase64;
+
 }
