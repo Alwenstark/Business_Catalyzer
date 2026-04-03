@@ -15,10 +15,12 @@ import {
 import { UploadOutlined } from "@ant-design/icons";
 import axios from "axios";
 import "../App.css";
+import BASE_URL from "../api";
 
 const { Content } = Layout;
 const { TextArea } = Input;
 const { Option } = Select;
+axios.defaults.withCredentials = true;
 
 const CustomerComplaint = () => {
 
@@ -47,7 +49,7 @@ const CustomerComplaint = () => {
     try {
 
       const res = await axios.get(
-        `http://localhost:8080/api/business/search?name=${value}`
+        `${BASE_URL}/api/business/search?name=${value}`
       );
 
       const autoOptions = res.data.map((c) => ({
@@ -82,14 +84,8 @@ const CustomerComplaint = () => {
 
   const onFinish = async (values) => {
 
-    const userId = localStorage.getItem("userId");
 
     const payload = {
-
-      user: {
-        id: userId
-      },
-
       companyName: values.company,
       gst: values.gst,
       state: values.state,
@@ -100,13 +96,12 @@ const CustomerComplaint = () => {
       notes: values.notes || "",
       mood: mood,
       imageBase64: imageBase64
-
     };
 
     try {
 
       await axios.post(
-        "http://localhost:8080/api/cases",
+        `${BASE_URL}/api/cases`,
         payload
       );
 
