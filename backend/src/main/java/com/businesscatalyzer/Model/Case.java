@@ -3,6 +3,8 @@ package com.businesscatalyzer.Model;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "cases")
 @Getter
@@ -16,7 +18,6 @@ public class Case {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Case belongs to a user
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -39,9 +40,15 @@ public class Case {
     @Enumerated(EnumType.STRING)
     private CaseStatus status;
 
-    // Base64 image
     @Lob
     @Column(columnDefinition = "LONGTEXT")
     private String imageBase64;
 
+    private LocalDateTime createdAt;
+
+    @Enumerated(EnumType.STRING)
+    private Mood resolvedMood;
+
+    private LocalDateTime resolvedAt;
+    private LocalDateTime reopenedAt;
 }

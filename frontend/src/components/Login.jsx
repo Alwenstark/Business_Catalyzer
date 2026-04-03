@@ -9,6 +9,7 @@ import {
   Divider,
   message,
 } from "antd";
+import BASE_URL from "../api";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
@@ -24,7 +25,7 @@ const Login = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:8080/api/users/login",
+        `${BASE_URL}/api/users/login`,
         values
       );
 
